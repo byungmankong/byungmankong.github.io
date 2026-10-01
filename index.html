@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="13년 6개월 경력 DBA 공병만의 포트폴리오. SQL Server·MySQL 운영, 고가용성, SQL 개발, 데이터 연동 자동화.">
+<meta property="og:title" content="공병만 | DBA 포트폴리오">
+<meta property="og:description" content="SQL Server·MySQL 운영, 고가용성(Always On), SQL 프로시저 개발, 데이터 연동 자동화 경험을 정리했습니다.">
+<meta property="og:type" content="website">
+<title>공병만 | DBA 포트폴리오</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ===== [style-tokens] 색·글꼴 토큰: 디자인 단계에서 이 블록만 바꾸면 전체 반영 ===== */
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f6f7f9; --surface:#ffffff; --ink:#16202a; --muted:#5d6b78;
+  --line:#cdd5dc; --accent:#0e7c86; --placeholder:#e6ebef;
+  --font:"Noto Sans KR",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10161c; --surface:#18212a; --ink:#e8eef3; --muted:#93a1ae;
+    --line:#2f3d4a; --accent:#4fc3cc; --placeholder:#223039;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10161c; --surface:#18212a; --ink:#e8eef3; --muted:#93a1ae;
+  --line:#2f3d4a; --accent:#4fc3cc; --placeholder:#223039;
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.7}
+img,svg{max-width:100%}
+a{color:inherit}
+h1,h2,h3{line-height:1.3;margin:0 0 .5em}
+p{margin:0 0 .8em;max-width:64ch}
+
+/* ===== [style-layout] 공통 레이아웃 ===== */
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+.section{padding:72px 0;border-top:1px solid var(--line)}
+.section > .wrap{position:relative}
+.section-title{font-size:1.5rem}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.grid-4{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px}
+.ph{background:var(--placeholder);border:1px dashed var(--line);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.85rem;text-align:center;padding:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:0}
+.chips li{border:1px solid var(--line);border-radius:4px;padding:2px 10px;font-size:.85rem;color:var(--muted)}
+.btn{display:inline-block;padding:10px 20px;border-radius:6px;border:1px solid var(--accent);text-decoration:none;font-weight:500}
+.btn-primary{background:var(--accent);color:var(--bg)}
+.btn-ghost{color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+
+/* 섹션 이름표: 수정 요청 시 이 이름으로 지목. 최종 배포 전 .id-tag{display:none} 처리 */
+.id-tag{position:absolute;top:-56px;right:20px;font-family:var(--mono);font-size:.75rem;color:var(--accent);background:var(--surface);border:1px solid var(--accent);border-radius:4px;padding:2px 8px}
+.sub-tag{font-family:var(--mono);font-size:.7rem;color:var(--accent);display:block;margin-bottom:6px}
+
+/* ===== [style-nav] ===== */
+#site-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
+#site-nav .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;justify-content:space-between;min-height:56px}
+#site-nav ul{display:flex;flex-wrap:wrap;gap:4px 18px;list-style:none;margin:0;padding:0;font-size:.9rem}
+#site-nav a{text-decoration:none;color:var(--muted)}
+#site-nav .brand{font-weight:700}
+
+/* ===== [style-hero] ===== */
+#section-hero{padding:96px 0 72px;border-top:0}
+.hero-title{font-size:clamp(1.9rem,5vw,3rem)}
+.hero-role{color:var(--accent);font-weight:500;margin-bottom:.4em}
+.hero-layout{display:grid;gap:32px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center}
+.hero-photo{aspect-ratio:1/1;max-width:260px}
+
+/* ===== [style-impact] ===== */
+.stat-value{font-size:2rem;font-weight:700;line-height:1.2}
+.stat-label{color:var(--muted);font-size:.9rem}
+
+/* ===== [style-projects] ===== */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card-block{margin-bottom:12px}
+.card-block h4{margin:0 0 2px;font-size:.9rem;color:var(--muted);font-weight:500}
+.card-block p{margin:0}
+.modal-slot{margin-top:24px}
+
+/* ===== [style-detail] 프로젝트 상세(모달 자리) ===== */
+.sample-badge{display:inline-block;font-size:.75rem;color:var(--muted);border:1px dashed var(--line);border-radius:4px;padding:1px 8px;margin-left:8px;vertical-align:middle}
+.pane h4{margin:0 0 10px;font-size:1rem}
+.pane pre{margin:0 0 10px;padding:12px;background:var(--placeholder);border-radius:6px;overflow-x:auto;font-family:var(--mono);font-size:.78rem;line-height:1.6}
+.pane .cap{font-size:.8rem;color:var(--muted);margin:0 0 6px}
+.pane ul{margin:0;padding-left:1.1em}
+.pane li{margin-bottom:.4em}
+.erd text{fill:var(--ink);font-family:var(--mono);font-size:11px}
+.erd .ent{fill:var(--surface);stroke:var(--line)}
+.erd .hd{fill:var(--placeholder);stroke:var(--line)}
+.erd line{stroke:var(--accent);stroke-width:1.5}
+.bench{width:100%;border-collapse:collapse;font-size:.85rem}
+.bench th,.bench td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+.bar{height:10px;border-radius:3px;background:var(--line)}
+.bar.after{background:var(--accent)}
+
+
+.flow{width:100%;max-width:430px;height:auto}
+.flow .node{fill:var(--s-card);stroke:var(--s-line)}
+.flow .node.key{stroke:var(--s-accent);stroke-width:1.5}
+.flow .node.err{stroke-dasharray:4 3}
+.flow .grp{fill:none;stroke:var(--s-accent);stroke-dasharray:5 4}
+.flow text{fill:var(--s-ink);font-family:var(--font);font-size:12.5px}
+.flow .sub{fill:var(--s-muted);font-size:10.5px}
+.flow .lbl{fill:var(--s-accent);font-family:var(--mono);font-size:11px}
+.flow line{stroke:var(--s-accent);stroke-width:1.5}
+.flow line.dash{stroke-dasharray:3 3;stroke:var(--s-muted)}
+.flow polygon{fill:var(--s-accent)}
+.flow path{fill:none;stroke:var(--s-accent);stroke-width:1.5}
+
+/* ===== [style-experience] ===== */
+.timeline{list-style:none;padding:0;margin:0;border-left:2px solid var(--line)}
+.timeline li{padding:0 0 20px 20px;position:relative}
+.timeline li::before{content:"";position:absolute;left:-6px;top:9px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.timeline .when{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+
+/* ===== [style-footer] ===== */
+#site-footer{border-top:1px solid var(--line);padding:32px 0;color:var(--muted);font-size:.85rem}
+
+@media (max-width:560px){ .section{padding:56px 0} .id-tag{top:-44px} }
+@media print{ #site-nav,.id-tag,.sub-tag{display:none} }
+
+.id-tag,.sub-tag{display:none!important}
+/* ===== [style-theme] 디자인 참고: RyanCV(bslthemes) 계열의 다크·라이트 대응 카드형 포트폴리오.
+   섹션별 색상 톤: 각 섹션의 --s-* 값만 바꾸면 해당 섹션 톤이 바뀝니다. light-dark(라이트, 다크) ===== */
+:root{color-scheme:light dark}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark}
+
+.section{background:var(--s-bg);color:var(--s-ink);border-top:0}
+.section .box{background:var(--s-card);border-color:var(--s-line)}
+.section .stat-label,.section .cap,.section .card-block h4,.section .timeline .when{color:var(--s-muted)}
+.section a:not(.btn){color:var(--s-accent)}
+.section .btn-primary{background:var(--s-accent);border-color:var(--s-accent);color:var(--s-on)}
+.section .btn-ghost{color:var(--s-accent);border-color:var(--s-accent)}
+.section .chips li{border-color:var(--s-line);color:var(--s-muted)}
+.section .ph,.section .pane pre{background:var(--s-ph);border-color:var(--s-line);color:var(--s-muted)}
+.section .id-tag,.section .sub-tag{color:var(--s-accent);border-color:var(--s-accent);background:var(--s-card)}
+.section .sub-tag{background:none;border:0}
+.section .section-title{border-left:4px solid var(--s-accent);padding-left:12px}
+.section .timeline{border-left-color:var(--s-line)}
+.section .timeline li::before{background:var(--s-accent)}
+.section .bench th,.section .bench td{border-bottom-color:var(--s-line)}
+.section .bar{background:var(--s-line)}
+.section .bar.after{background:var(--s-accent)}
+.section .erd text{fill:var(--s-ink)}
+.section .erd .ent{fill:var(--s-card);stroke:var(--s-line)}
+.section .erd .hd{fill:var(--s-ph);stroke:var(--s-line)}
+.section .erd line{stroke:var(--s-accent)}
+.section .sample-badge{color:var(--s-muted);border-color:var(--s-line)}
+
+/* hero: 딥 네이비 + 테이블 격자 모티프 */
+#section-hero{--s-bg:light-dark(#0f2233,#0a1622);--s-ink:#eaf2f7;--s-muted:#9db3c4;--s-accent:#5fd0d8;--s-on:#0f2233;--s-card:light-dark(#16324a,#112536);--s-line:#2a4a63;--s-ph:light-dark(#1a3a55,#0f2233);
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:32px 32px}
+/* impact: 틸 + 앰버 숫자 */
+#section-impact{--s-bg:light-dark(#0e7c86,#0a4f56);--s-ink:#ffffff;--s-muted:#cfeef0;--s-accent:#ffd166;--s-on:#10262a;--s-card:light-dark(#0b6a73,#083c42);--s-line:rgba(255,255,255,.28);--s-ph:rgba(0,0,0,.2)}
+#section-impact .stat-value{color:var(--s-accent)}
+/* skills: 페일 블루 */
+#section-skills{--s-bg:light-dark(#e9f0f9,#122033);--s-ink:light-dark(#14263d,#e6eef8);--s-muted:light-dark(#51667e,#9db0c6);--s-accent:light-dark(#2b5cab,#7fb0ff);--s-on:light-dark(#ffffff,#0f1a29);--s-card:light-dark(#ffffff,#1a2c44);--s-line:light-dark(#c3d2e4,#2a4160);--s-ph:light-dark(#dbe6f3,#1f3350)}
+/* projects: 인디고 다크 + 앰버 포인트 (가장 눈에 띄는 섹션) */
+#section-projects{--s-bg:light-dark(#1d2545,#121830);--s-ink:#eef0fb;--s-muted:#a9b1d6;--s-accent:#f2b84b;--s-on:#1d2545;--s-card:light-dark(#273059,#1a2244);--s-line:#3a4577;--s-ph:light-dark(#1a2244,#0f1530)}
+/* experience: 페일 세이지 */
+#section-experience{--s-bg:light-dark(#e8f3ec,#12231b);--s-ink:light-dark(#14291f,#e4f2ea);--s-muted:light-dark(#4d6a5b,#9bb8a8);--s-accent:light-dark(#2a7a55,#63d3a0);--s-on:light-dark(#ffffff,#0d1a13);--s-card:light-dark(#ffffff,#1a3126);--s-line:light-dark(#bcd6c6,#29473a);--s-ph:light-dark(#d5e7dc,#1e372b)}
+/* contact: 딥 틸 */
+#section-contact{--s-bg:light-dark(#0b3b40,#062a2e);--s-ink:#e7f6f4;--s-muted:#9fcfc9;--s-accent:#7be0c3;--s-on:#062a2e;--s-card:light-dark(#0f4d53,#0a3a3f);--s-line:#1f6a70;--s-ph:#0a3a3f}
+/* nav · footer */
+#site-nav{background:#0a1622;border-bottom-color:#1f3a52}
+#site-nav .brand{color:#eaf2f7}
+#site-nav a{color:#9db3c4}
+#site-nav .btn-primary{background:#5fd0d8;border-color:#5fd0d8;color:#0a1622}
+#site-footer{background:#0a121b;border-top:0;color:#8ea3b4}
+</style>
+</head>
+<body>
+
+<header id="site-nav">
+  <div class="wrap">
+    <a class="brand" href="#section-hero">공병만</a>
+    <nav aria-label="주요 메뉴">
+      <ul>
+        <li><a href="#section-skills">역량</a></li>
+        <li><a href="#section-projects">프로젝트</a></li>
+        <li><a href="#section-experience">경력·자격</a></li>
+        <li><a href="#section-contact">연락</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="section" id="section-hero" aria-labelledby="hero-title">
+  <div class="wrap">
+    <span class="id-tag">#section-hero</span>
+    <div class="hero-layout">
+      <div id="hero-text">
+        <p class="hero-role" id="hero-role">Database Administrator</p>
+        <h1 class="hero-title" id="hero-title">13년 6개월, 서비스가 멈추지 않도록 데이터베이스를 운영하고 설계해 온 DBA</h1>
+        <p id="hero-summary">게임·커머스·플랫폼 서비스에서 SQL Server와 MySQL의 운영, 성능 튜닝, 백업·복구, 고가용성 구성부터 데이터 모델링과 SQL 개발까지 맡아 왔습니다.</p>
+        <div class="row" id="hero-cta">
+          <a class="btn btn-primary" id="hero-blog-btn" href="https://boongman.tistory.com/">기술 블로그 보기</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="section-impact" aria-label="핵심 경력 수치">
+  <div class="wrap">
+    <span class="id-tag">#section-impact</span>
+    <div class="grid grid-4">
+      <div class="box" id="impact-stat-1"><div class="stat-value">13년 6개월</div><div class="stat-label">DBA·데이터 관리 경력</div></div>
+      <div class="box" id="impact-stat-2"><div class="stat-value">6개 사</div><div class="stat-label">게임·커머스·플랫폼 서비스 운영</div></div>
+      <div class="box" id="impact-stat-3"><div class="stat-value">3개 사</div><div class="stat-label">ISMS 인증 대응 DB 담당</div></div>
+      <div class="box" id="impact-stat-4"><div class="stat-value">4개</div><div class="stat-label">자격증 (MCTS·MCITP·MCP·정보처리기사)</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="section-skills" aria-labelledby="skills-title">
+  <div class="wrap">
+    <span class="id-tag">#section-skills</span>
+    <h2 class="section-title" id="skills-title">핵심 역량</h2>
+    <div class="grid grid-3">
+      <article class="box" id="skill-db-ops">
+        <h3>DB 운영·성능 튜닝</h3>
+        <ul class="chips"><li>SQL Server</li><li>MySQL</li><li>Slow Query 분석</li><li>서버 모니터링</li><li>장애 대응</li></ul>
+        <p><a href="#project-query-tuning">근거 프로젝트 보기</a></p>
+      </article>
+      <article class="box" id="skill-sql-dev">
+        <h3>SQL 개발·프로시저</h3>
+        <ul class="chips"><li>저장 프로시저</li><li>쿼리 개발·유지보수</li><li>서비스 기능 구현</li></ul>
+        <p class="stat-label">알파몰: 회원·주문·상품<br>잡코리아: 서비스 기능<br>더이앤엠: 회원·결제·주문</p>
+      </article>
+      <article class="box" id="skill-backup-ha">
+        <h3>백업·복구·고가용성</h3>
+        <ul class="chips"><li>Always On</li><li>MSSQL Replication</li><li>Clustering</li><li>MySQL Replica</li><li>백업 정책·스크립트</li><li>버전 업그레이드</li></ul>
+        <p><a href="#project-ha-modeling">근거 프로젝트 보기</a></p>
+      </article>
+      <article class="box" id="skill-pipeline">
+        <h3>데이터 수집·연동·BI</h3>
+        <ul class="chips"><li>ETL</li><li>Python(Selenium)</li><li>Open API 연동</li><li>BI ODS</li><li>Power BI</li></ul>
+        <p><a href="#project-etl-pipeline">근거 프로젝트 보기</a></p>
+      </article>
+      <article class="box" id="skill-modeling-security">
+        <h3>데이터 모델링·보안</h3>
+        <ul class="chips"><li>데이터 모델링(DA)</li><li>exERD</li><li>데이터 거버넌스</li><li>DB 암호화</li><li>DB 감사</li></ul>
+      </article>
+      <article class="box" id="skill-language">
+        <h3>언어·도구</h3>
+        <ul class="chips"><li>SQL</li><li>Python</li><li>Power BI</li><li>Tableau 지원</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="section-projects" aria-labelledby="projects-title">
+  <div class="wrap">
+    <span class="id-tag">#section-projects</span>
+    <h2 class="section-title" id="projects-title">대표 프로젝트</h2>
+    <div class="grid grid-3">
+
+      <article class="box" id="project-query-tuning">
+        <span class="sub-tag">#project-query-tuning</span>
+        <h3>쿼리·성능 튜닝</h3>
+        <p>운영 중인 SQL Server와 MySQL에서 느린 쿼리를 찾아 개선했습니다.</p>
+        <div class="card-block"><h4>문제</h4><p>서비스 운영 중 발생하는 슬로우 쿼리와 성능 저하, 장애.</p></div>
+        <div class="card-block"><h4>접근</h4><p>Slow Query 분석과 SQL 최적화, 서버 모니터링을 바탕으로 한 성능 튜닝과 장애 대응.</p></div>
+        <ul class="chips"><li>SQL Server</li><li>MySQL</li><li>Slow Query</li></ul>
+        <p class="stat-label">알파 · 더이앤엠 · 텐바이텐</p>
+      </article>
+
+      <article class="box" id="project-etl-pipeline">
+        <span class="sub-tag">#project-etl-pipeline</span>
+        <h3>데이터 수집·연동 자동화</h3>
+        <p>수작업이던 데이터 수집과 연동을 Python, API, ETL로 자동화했습니다.</p>
+        <div class="card-block"><h4>문제</h4><p>사람이 직접 처리하던 가격·상품·외부 데이터 수집과 연동 업무.</p></div>
+        <div class="card-block"><h4>접근</h4><p>Selenium 가격정보 수집과 상품 연계, 사방넷 API 연동, 공공데이터 Open API 수집, 기업 데이터 ETL과 BI ODS 구축.</p></div>
+        <ul class="chips"><li>Python</li><li>Selenium</li><li>Open API</li><li>ETL</li><li>Power BI</li></ul>
+        <p class="stat-label">알파 · 더이앤엠 · 텐바이텐 · 웍스피어</p>
+        <p class="row"><a href="#project-detail-etl">상세 보기</a></p>
+      </article>
+
+      <article class="box" id="project-ha-modeling">
+        <span class="sub-tag">#project-ha-modeling</span>
+        <h3>고가용성·백업·업그레이드</h3>
+        <p>서비스 중단을 줄이는 HA 구성과 백업 체계, 안전한 버전 업그레이드를 맡았습니다.</p>
+        <div class="card-block"><h4>문제</h4><p>대규모 게임·플랫폼 서비스의 무중단 운영과 데이터 보호, 노후 버전 교체.</p></div>
+        <div class="card-block"><h4>접근</h4><p>SQL Server Always On 가용성 그룹 구성(잡코리아), MSSQL Replication·Clustering과 MySQL Replica 구성(넷마블), 백업 정책과 중앙 관리 스크립트, 전사 DB 모니터링(SMS 알림), SQL Server 2014에서 2019로 업그레이드와 데이터 마이그레이션.</p></div>
+        <ul class="chips"><li>Always On</li><li>Replication</li><li>Clustering</li><li>백업·복구</li><li>마이그레이션</li></ul>
+        <p class="stat-label">넷마블 · 웍스피어 · 더이앤엠</p>
+        <p class="row"><a href="#project-detail-ha">상세 보기</a></p>
+      </article>
+    </div>
+
+    <div class="box modal-slot" id="project-detail-etl">
+      <span class="sub-tag">#project-detail-etl</span>
+      <h3>프로젝트 상세: 데이터 수집·연동 자동화</h3>
+      <p class="stat-label">웍스피어(잡코리아 담당) 재직 시, NICE 기업정보 데이터를 받아 잡코리아 데이터베이스에 삽입하는 과정을 SSIS로 구축·관리했습니다.</p>
+      <div class="grid grid-2">
+
+        <div class="pane" id="detail-etl-flow">
+          <h4>전체 흐름</h4>
+          <svg class="flow" viewBox="0 0 430 510" role="img" aria-label="NICE 기업정보를 SSIS로 잡코리아 DB에 적재하는 흐름도"><rect class="grp" x="4" y="148" width="262" height="286" rx="8"/><text class="lbl" x="262" y="142" text-anchor="end">SSIS 패키지</text><rect class="node key" x="10" y="10" width="250" height="46" rx="6"/><text class="t" x="135.0" y="30" text-anchor="middle">NICE 기업정보</text><text class="sub" x="135.0" y="47" text-anchor="middle">외부 제공 데이터</text><line x1="135.0" y1="56" x2="135.0" y2="78"/><polygon points="130.0,77 140.0,77 135.0,84"/><rect class="node" x="10" y="84" width="250" height="46" rx="6"/><text class="t" x="135.0" y="104" text-anchor="middle">데이터 수신</text><text class="sub" x="135.0" y="121" text-anchor="middle">제공 데이터 확인·준비</text><line x1="135.0" y1="130" x2="135.0" y2="152"/><polygon points="130.0,151 140.0,151 135.0,158"/><rect class="node" x="10" y="158" width="250" height="46" rx="6"/><text class="t" x="135.0" y="178" text-anchor="middle">Staging 적재</text><text class="sub" x="135.0" y="195" text-anchor="middle">Data Flow · 원본 그대로</text><line x1="135.0" y1="204" x2="135.0" y2="226"/><polygon points="130.0,225 140.0,225 135.0,232"/><rect class="node" x="10" y="232" width="250" height="46" rx="6"/><text class="t" x="135.0" y="252" text-anchor="middle">정제·검증</text><text class="sub" x="135.0" y="269" text-anchor="middle">형 변환 · NULL·중복 검사</text><line x1="135.0" y1="278" x2="135.0" y2="300"/><polygon points="130.0,299 140.0,299 135.0,306"/><rect class="node" x="10" y="306" width="250" height="46" rx="6"/><text class="t" x="135.0" y="326" text-anchor="middle">기업 매칭</text><text class="sub" x="135.0" y="343" text-anchor="middle">Lookup · 기존 기업 식별</text><line x1="135.0" y1="352" x2="135.0" y2="374"/><polygon points="130.0,373 140.0,373 135.0,380"/><rect class="node" x="10" y="380" width="250" height="46" rx="6"/><text class="t" x="135.0" y="400" text-anchor="middle">신규 Insert / 변경 Update</text><text class="sub" x="135.0" y="417" text-anchor="middle">Conditional Split</text><line x1="135.0" y1="426" x2="135.0" y2="448"/><polygon points="130.0,447 140.0,447 135.0,454"/><rect class="node key" x="10" y="454" width="250" height="46" rx="6"/><text class="t" x="135.0" y="474" text-anchor="middle">잡코리아 DB</text><text class="sub" x="135.0" y="491" text-anchor="middle">기업정보 테이블</text><rect class="node err" x="290" y="240" width="130" height="178" rx="6"/><text class="t" x="355" y="322" text-anchor="middle">오류 로그</text><text class="sub" x="355" y="340" text-anchor="middle">오류 행·사유</text><text class="sub" x="355" y="356" text-anchor="middle">별도 저장</text><line class="dash" x1="260" y1="255" x2="290" y2="255"/><line class="dash" x1="260" y1="329" x2="290" y2="329"/><line class="dash" x1="260" y1="403" x2="290" y2="403"/></svg>
+          <p class="cap">점선 박스가 SSIS 패키지 범위입니다.</p>
+        </div>
+
+        <div class="pane" id="detail-etl-steps">
+          <h4>단계별 SSIS 구성</h4>
+          <table class="bench">
+            <tr><th>단계</th><th>구성요소</th><th>하는 일</th></tr>
+            <tr><td>Staging 적재</td><td>Source → OLE DB Destination</td><td>받은 데이터를 가공 없이 임시 테이블에 적재</td></tr>
+            <tr><td>정제·검증</td><td>Data Conversion, Derived Column</td><td>자료형 변환, 공백·NULL·중복 정리</td></tr>
+            <tr><td>기업 매칭</td><td>Lookup</td><td>기존 잡코리아 기업과 동일 기업 식별</td></tr>
+            <tr><td>분기</td><td>Conditional Split</td><td>신규는 Insert, 변경분은 Update로 분리</td></tr>
+            <tr><td>오류 처리</td><td>Error Output</td><td>실패한 행과 사유를 로그 테이블에 저장</td></tr>
+          </table>
+          <h4 style="margin-top:20px">패키지 실행 순서</h4>
+<pre>Control Flow
+1. SQL 실행   Staging 초기화
+2. Data Flow  NICE 데이터 → Staging
+3. SQL 실행   건수·품질 검증
+4. Data Flow  Staging → 기업정보 (매칭·분기)
+5. SQL 실행   처리 결과 로그 기록</pre>
+        </div>
+
+        <div class="pane" id="detail-etl-ops">
+          <h4>운영 관점</h4>
+          <ul>
+            <li><strong>재실행 안전성</strong>: 매 실행 전 Staging을 비워 실패 후 다시 돌려도 중복 적재되지 않게 구성</li>
+            <li><strong>건수 대사</strong>: 수신 건수와 적재 건수를 비교해 누락 확인</li>
+            <li><strong>스케줄과 알림</strong>: SQL Server Agent 작업으로 실행하고 실패 시 알림</li>
+            <li><strong>오류 행 관리</strong>: 오류 행을 버리지 않고 사유와 함께 별도 보관</li>
+          </ul>
+        </div>
+
+
+      </div>
+    </div>
+
+    <div class="box modal-slot" id="project-detail-ha">
+      <span class="sub-tag">#project-detail-ha</span>
+      <h3>프로젝트 상세: 고가용성·백업·업그레이드</h3>
+      <p class="stat-label">잡코리아 SQL Server 환경에서 Always On 가용성 그룹으로 고가용성을 구성했습니다. 이전에는 MSSQL Replication·Clustering과 MySQL Replica로 HA를 구성한 경험도 있습니다.</p>
+      <div class="grid grid-2">
+
+        <div class="pane" id="detail-ha-diagram">
+          <h4>구성도</h4>
+          <svg class="flow" viewBox="0 0 430 300" role="img" aria-label="SQL Server Always On 가용성 그룹 구성도"><defs><marker id="ha-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><polygon points="0,0 10,5 0,10"/></marker></defs><rect class="grp" x="4" y="78" width="422" height="214" rx="8"/><text class="lbl" x="12" y="72">WSFC 클러스터</text><rect class="node" x="140" y="10" width="150" height="46" rx="6"/><text class="t" x="215.0" y="31.0" text-anchor="middle">애플리케이션</text><text class="sub" x="215.0" y="47.0" text-anchor="middle">접속 대상: 리스너 이름</text><rect class="node key" x="140" y="94" width="150" height="46" rx="6"/><text class="t" x="215.0" y="115.0" text-anchor="middle">AG 리스너</text><text class="sub" x="215.0" y="131.0" text-anchor="middle">장애 조치 후에도 같은 주소</text><rect class="node key" x="10" y="190" width="110" height="60" rx="6"/><text class="t" x="65.0" y="218.0" text-anchor="middle">Primary</text><text class="sub" x="65.0" y="234.0" text-anchor="middle">읽기·쓰기</text><rect class="node" x="160" y="190" width="110" height="60" rx="6"/><text class="t" x="215.0" y="218.0" text-anchor="middle">Secondary 1</text><text class="sub" x="215.0" y="234.0" text-anchor="middle">동기 · 자동 장애 조치</text><rect class="node" x="310" y="190" width="110" height="60" rx="6"/><text class="t" x="365.0" y="218.0" text-anchor="middle">Secondary 2</text><text class="sub" x="365.0" y="234.0" text-anchor="middle">비동기 · 읽기·백업</text><line x1="215" y1="56" x2="215" y2="93" marker-end="url(#ha-ah)"/><line x1="215" y1="140" x2="65" y2="189" marker-end="url(#ha-ah)"/><line x1="215" y1="140" x2="215" y2="189" marker-end="url(#ha-ah)"/><line x1="215" y1="140" x2="365" y2="189" marker-end="url(#ha-ah)"/><line x1="120" y1="220" x2="159" y2="220" marker-end="url(#ha-ah)"/><text class="sub" x="140" y="212" text-anchor="middle">동기</text><path d="M65 250 V274 H365 V251" marker-end="url(#ha-ah)"/><text class="sub" x="215" y="268" text-anchor="middle">비동기 로그 전송</text></svg>
+        </div>
+
+        <div class="pane" id="detail-ha-components">
+          <h4>구성요소</h4>
+          <table class="bench">
+            <tr><th>구성요소</th><th>역할</th></tr>
+            <tr><td>WSFC 클러스터</td><td>노드 상태 감시와 장애 조치 기반</td></tr>
+            <tr><td>가용성 그룹(AG)</td><td>여러 DB를 묶어 복제본 간 동기화</td></tr>
+            <tr><td>리스너</td><td>애플리케이션이 항상 현재 Primary로 접속</td></tr>
+            <tr><td>동기 커밋</td><td>데이터 손실 없이 자동 장애 조치</td></tr>
+            <tr><td>비동기 커밋</td><td>읽기 전용 조회·백업 분산, 원거리 복제</td></tr>
+          </table>
+        </div>
+
+        <div class="pane" id="detail-ha-failover">
+          <h4>장애 조치 흐름</h4>
+<pre>1. Primary 장애를 WSFC가 감지
+2. 동기 Secondary가 Primary로 승격
+3. 리스너가 새 Primary로 연결 전환
+4. 애플리케이션이 재연결하여 서비스 지속
+5. 복구된 기존 Primary는 Secondary로 재편입</pre>
+        </div>
+
+        <div class="pane" id="detail-ha-ops">
+          <h4>선택 이유와 운영 관점</h4>
+          <ul>
+            <li><strong>선택 이유</strong>: 공유 스토리지 없이 복제본별 독립 스토리지로 구성할 수 있고, Secondary를 읽기·백업에 활용 가능</li>
+            <li><strong>모니터링</strong>: 동기화 상태와 로그 전송 지연을 지속 확인</li>
+            <li><strong>장애 조치 리허설</strong>: 실제 장애 전에 절체 테스트로 절차 검증</li>
+            <li><strong>패치·업그레이드</strong>: Secondary부터 순차 적용해 서비스 중단 최소화</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="section-experience" aria-labelledby="experience-title">
+  <div class="wrap">
+    <span class="id-tag">#section-experience</span>
+    <h2 class="section-title" id="experience-title">경력 · 자격</h2>
+    <div class="grid grid-2">
+      <div id="experience-timeline">
+        <span class="sub-tag">#experience-timeline</span>
+        <ol class="timeline">
+          <li><span class="when">2024.07 – 2026.01</span><h3>알파 주식회사 · 알파몰 개발팀 차장(팀장)</h3><p>알파몰 회원·주문·상품 기능 프로시저 개발, MSSQL 튜닝·운영, 백업·복구 정책 수립, ISMS 대응 DB 암호화 개발, 사방넷 API 연동, 수동 업무 자동화.</p></li>
+          <li><span class="when">2022.07 – 2024.07</span><h3>더이앤엠 · DB팀 연구원</h3><p>팝콘티비 DB 설계, 회원·결제·주문 기능 프로시저 개발, SQL Server 2014에서 2019 업그레이드, ISMS 대응 보안 정책, MySQL Replication·백업·Slow Query 최적화.</p></li>
+          <li><span class="when">2019.02 – 2022.07</span><h3>텐바이텐 · 개발팀 차장(팀장)</h3><p>e-커머스 DB 모델링, SQL 최적화, 검색엔진 연동, Selenium 가격 수집 자동화, Power BI 대시보드, DB 표준화.</p></li>
+          <li><span class="when">2016.03 – 2019.01</span><h3>웍스피어 · 정보시스템팀 차장</h3><p>잡코리아·알바몬 모델링, 잡코리아 서비스 기능 프로시저 개발, SQL Server Always On 구성, 데이터 거버넌스, BI ODS·ETL, DB 감사와 ISMS 대응.</p></li>
+          <li><span class="when">2013.11 – 2015.10</span><h3>넷마블 · DB팀 과장</h3><p>전사 DB 모니터링, MSSQL·MySQL 고가용성 구성, 백업 스크립트, 무인 설치 자동화, 게임 서비스 튜닝·장애 조치.</p></li>
+          <li><span class="when">2012.04 – 2013.10</span><h3>네시삼십삼분 · DB팀 과장(팀장)</h3><p>DB 관리, 개발사 컨설팅, 라이브 서비스 성능 모니터링, 게임 지표 추출.</p></li>
+        </ol>
+      </div>
+      <div id="experience-certs">
+        <span class="sub-tag">#experience-certs</span>
+        <ul class="chips">
+          <li>MCTS (2011)</li><li>MCITP (2011)</li><li>MCP (2006)</li><li>정보처리기사 (2004)</li>
+        </ul>
+        <p class="stat-label" id="experience-education">학력: 대진대학교 컴퓨터공학 졸업</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="section-contact" aria-labelledby="contact-title">
+  <div class="wrap">
+    <span class="id-tag">#section-contact</span>
+    <h2 class="section-title" id="contact-title">연락하기</h2>
+    <p id="contact-message">데이터베이스가 안정적으로 유지되도록 지키면서, 더 나은 데이터 환경과 서비스를 만들어 가는 DBA가 되고자 합니다.</p>
+    <div class="row" id="contact-links">
+      <a class="btn btn-primary" id="contact-email" href="mailto:genuinebless@naver.com">이메일 보내기</a>
+      <a class="btn btn-ghost" id="contact-blog" href="https://boongman.tistory.com/">기술 블로그</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer id="site-footer">
+  <div class="wrap">
+    <span id="footer-copy">© 2026 공병만</span>
+    
+  </div>
+</footer>
+
+</body>
+</html>
